@@ -23,14 +23,14 @@
 		5B99B4C2140FD38C00EF4C77 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5B99B4C4140FD38C00EF4C77 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5B99B4C6140FD38C00EF4C77 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		5B99B4CA140FD38C00EF4C77 /* NavigationBasedAppFirst-Info.plist */ = {isa = PBXFileReference; path = "NavigationBasedAppFirst-Info.plist"; sourceTree = "<group>"; };
+		5B99B4CA140FD38C00EF4C77 /* NavigationBasedAppFirst-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NavigationBasedAppFirst-Info.plist"; sourceTree = "<group>"; };
 		5B99B4CC140FD38C00EF4C77 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		5B99B4CE140FD38C00EF4C77 /* NavigationBasedAppFirst-Prefix.pch */ = {isa = PBXFileReference; path = "NavigationBasedAppFirst-Prefix.pch"; sourceTree = "<group>"; };
+		5B99B4CE140FD38C00EF4C77 /* NavigationBasedAppFirst-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NavigationBasedAppFirst-Prefix.pch"; sourceTree = "<group>"; };
 		5B99B4CF140FD38C00EF4C77 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		5B99B4D1140FD38C00EF4C77 /* NavigationBasedAppFirstAppDelegate.h */ = {isa = PBXFileReference; path = NavigationBasedAppFirstAppDelegate.h; sourceTree = "<group>"; };
+		5B99B4D1140FD38C00EF4C77 /* NavigationBasedAppFirstAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NavigationBasedAppFirstAppDelegate.h; sourceTree = "<group>"; };
 		5B99B4D2140FD38C00EF4C77 /* NavigationBasedAppFirstAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NavigationBasedAppFirstAppDelegate.m; sourceTree = "<group>"; };
 		5B99B4D5140FD38C00EF4C77 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
-		5B99B4D7140FD38C00EF4C77 /* RootViewController.h */ = {isa = PBXFileReference; path = RootViewController.h; sourceTree = "<group>"; };
+		5B99B4D7140FD38C00EF4C77 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		5B99B4D8140FD38C00EF4C77 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		5B99B4DB140FD38C00EF4C77 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/RootViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
