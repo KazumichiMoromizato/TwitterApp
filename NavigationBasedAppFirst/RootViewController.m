@@ -51,7 +51,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 0;
+    return 2;
 }
 
 // Customize the appearance of table view cells.
@@ -65,6 +65,11 @@
     }
 
     // Configure the cell.
+    if (indexPath.row == 0) {
+        cell.textLabel.text = @"test1";    
+    } else if (indexPath.row == 1) {
+        cell.textLabel.text = @"test2";
+    }
     return cell;
 }
 
@@ -139,6 +144,13 @@
 - (void)dealloc
 {
     [super dealloc];
+}
+
+// arrow for each item
+- (UITableViewCellAccessoryType)tableView:(UITableView *)tableView 
+         accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellAccessoryDisclosureIndicator;
 }
 
 @end
