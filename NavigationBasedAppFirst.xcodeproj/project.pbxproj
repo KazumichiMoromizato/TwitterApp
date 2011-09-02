@@ -142,10 +142,10 @@
 				5B99B4D7140FD38C00EF4C77 /* RootViewController.h */,
 				5B99B4D8140FD38C00EF4C77 /* RootViewController.m */,
 				5B99B4DA140FD38C00EF4C77 /* RootViewController.xib */,
-				5B99B4C9140FD38C00EF4C77 /* Supporting Files */,
 				5B99B4F31410689A00EF4C77 /* DetailViewController.h */,
 				5B99B4F41410689A00EF4C77 /* DetailViewController.m */,
 				5B99B4F51410689A00EF4C77 /* DetailViewController.xib */,
+				5B99B4C9140FD38C00EF4C77 /* Supporting Files */,
 			);
 			path = NavigationBasedAppFirst;
 			sourceTree = "<group>";
