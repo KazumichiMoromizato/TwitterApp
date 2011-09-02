@@ -124,7 +124,7 @@
     [detailViewController release];
 	*/
     
-    NSString *className = @"IssueViewController";
+    NSString *className = @"DetailViewController";
     
     Class class = NSClassFromString( className );
 	UIViewController* viewController = [[[class alloc] init] autorelease];
