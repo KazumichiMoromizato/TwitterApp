@@ -87,7 +87,7 @@
 							<reference key="IBUINavigationBar"/>
 							<string key="IBUITitle">Issue List</string>
 							<object class="IBUIBarButtonItem" key="IBUILeftBarButtonItem" id="635202186">
-								<string key="IBUITitle">Item</string>
+								<string key="IBUITitle">GET</string>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<int key="IBUIStyle">1</int>
 								<reference key="IBUINavigationItem" ref="394667715"/>
@@ -137,11 +137,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">getTwitterUserTimeline:</string>
+						<string key="label">reloadButtonAction:</string>
 						<reference key="source" ref="635202186"/>
 						<reference key="destination" ref="619226028"/>
 					</object>
-					<int key="connectionID">35</int>
+					<int key="connectionID">36</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -269,7 +269,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">35</int>
+			<int key="maxID">36</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

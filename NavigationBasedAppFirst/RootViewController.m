@@ -8,12 +8,126 @@
 
 #import "RootViewController.h"
 #import "SBJson.h"
+#import "FMDatabase.h"
 
 @implementation RootViewController
+@synthesize statuses;
+
+
+- (void)updateStatuses
+{
+    NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
+    
+    statuses = [[NSMutableArray alloc] init];
+    
+    FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
+    if ([db open]) {
+        [db setShouldCacheStatements:YES];
+        statuses = [[NSMutableArray alloc] init];
+        FMResultSet *rs = [db executeQuery:@"select * from statuses limit 10"];
+        while ([rs next]) {
+            NSLog(@"%d %@", [rs intForColumn:@"id"], [rs stringForColumn:@"text"]);
+            [statuses addObject:[rs stringForColumn:@"text"]];
+        }
+        [rs close];  
+        [db close];
+    }else{
+        NSLog(@"Could not open db.");
+    }
+}
+
+-(void)getTwitterUserTimeline
+{ 
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com/status/user_timeline/libkinjodev.json"]];
+    
+    // URLからJSONデータを取得(NSData)
+    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    
+    // JSONで解析するために、NSDataをNSStringに変換。
+    NSString *json_string = [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding];
+    
+    // JSONデータをパースする。
+    // ここではJSONデータが配列としてパースされるので、NSArray型でデータ取得
+    NSArray *jsonrows = [json_string JSONValue];
+    
+    // DBに接続
+    NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
+    FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
+    if ([db open]) {
+        [db setShouldCacheStatements:YES];
+        
+        // statuses内の要素を取り出して、確認
+        [db beginTransaction];
+        for (NSDictionary *status in jsonrows) {
+            // You can retrieve individual values using objectForKey on the status NSDictionary
+            // This will print the tweet and username to the console
+            
+            // INSERT
+            NSLog(@"INSERT %@", [status objectForKey:@"text"]);
+            [db executeUpdate:@"insert into statuses (text) values (?)" , [status objectForKey:@"text"]];
+            if ([db hadError]) {
+                NSLog(@"Err %d: %@", [db lastErrorCode], [db lastErrorMessage]);
+            }
+        }
+        [db commit];
+        [db close];
+    }else{
+        NSLog(@"Could not open db.");
+    }
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+  
+    BOOL success;
+    NSError *error;	
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
+    success = [fm fileExistsAtPath:writableDBPath];
+    if(!success){
+        NSLog(@"No sample.db exists");
+        NSString *defaultDBPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"sample.db"];
+        success = [fm copyItemAtPath:defaultDBPath toPath:writableDBPath error:&error];
+        if(!success){
+            NSLog(@"%@", [error localizedDescription]);
+        }
+    }
+    
+    NSLog(@"sample.db exists");
+    // DB バージョンのチェック
+    FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
+    if ([db open]) {
+        [db setShouldCacheStatements:YES];
+        
+        FMResultSet *rs = [db executeQuery:@"SELECT * FROM schema_migrations where version = ?", @"1"];
+        if (![rs next]) {
+            // 現バージョンと異なれば create table を実行
+            [db beginTransaction];            
+            NSLog(@"Create statuses table");
+            [db executeUpdate:@"create table statuses(id integer primary key, text varchar(255));"];			
+            if ([db hadError]) {
+                NSLog(@"Err %d: %@", [db lastErrorCode], [db lastErrorMessage]);
+            }
+            NSLog(@"Update schema_migrations");
+            [db executeUpdate:@"insert into schema_migrations(version) values (?)" , @"1"];
+            if ([db hadError]) {
+                NSLog(@"Err %d: %@", [db lastErrorCode], [db lastErrorMessage]);
+            }
+            [db commit];
+        }
+        [rs close];  
+        [db close];
+        [self updateStatuses];
+    }else{
+        NSLog(@"Could not open db.");
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -44,34 +158,25 @@
 }
  */
 
-// Customize the number of sections in the table view.
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 1;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 2;
+    return [statuses count];
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
-    }
-
-    // Configure the cell.
-    if (indexPath.row == 0) {
-        cell.textLabel.text = @"test1";    
-    } else if (indexPath.row == 1) {
-        cell.textLabel.text = @"test2";
-    }
-    return cell;
+	static NSString* identifier = @"Cell";
+	UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+	if ( nil == cell ) {
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+									  reuseIdentifier:identifier];
+		[cell autorelease];
+		
+	}
+        
+    cell.textLabel.text = [statuses objectAtIndex:indexPath.row];
+	return cell;
 }
 
 /*
@@ -136,27 +241,11 @@
 	[self.navigationController pushViewController:viewController animated:YES];
 }
 
--(IBAction)getTwitterUserTimeline:(id)sender{
+-(IBAction)reloadButtonAction:(id)sender{
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com/status/user_timeline/libkinjo.json"]];
-    
-    // URLからJSONデータを取得(NSData)
-    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
-    
-    // JSONで解析するために、NSDataをNSStringに変換。
-    NSString *json_string = [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding];
-    
-    // JSONデータをパースする。
-    // ここではJSONデータが配列としてパースされるので、NSArray型でデータ取得
-    NSArray *statuses = [json_string JSONValue];
-    
-    // statuses内の要素を取り出して、確認
-    for (NSDictionary *status in statuses)
-    {
-        // You can retrieve individual values using objectForKey on the status NSDictionary
-        // This will print the tweet and username to the console
-        NSLog(@"%@", [status objectForKey:@"text"]);
-    }
+    [self getTwitterUserTimeline];
+    [self updateStatuses];
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -186,5 +275,6 @@
 {
     return UITableViewCellAccessoryDisclosureIndicator;
 }
+
 
 @end
