@@ -29,7 +29,6 @@
         statuses = [[NSMutableArray alloc] init];
         FMResultSet *rs = [db executeQuery:@"select * from statuses limit 10"];
         while ([rs next]) {
-            NSLog(@"%d %@", [rs intForColumn:@"id"], [rs stringForColumn:@"text"]);
             NSArray *keys = [NSArray arrayWithObjects:@"id", @"text", nil];
             NSArray *values = [NSArray arrayWithObjects:[rs stringForColumn:@"id"], [rs stringForColumn:@"text"], nil];
             NSDictionary *row = [[NSDictionary alloc] initWithObjects:values forKeys:keys];
@@ -72,7 +71,10 @@
             
             // INSERT
             NSLog(@"INSERT %@", [status objectForKey:@"text"]);
-            [db executeUpdate:@"insert into statuses (text) values (?)" , [status objectForKey:@"text"]];
+            [db executeUpdate:@"insert into statuses (text, screen_name, created_at) values (?, ?, ?)", 
+             [status objectForKey:@"text"],
+             [[status objectForKey:@"user"] objectForKey:@"screen_name"],
+             [status objectForKey:@"created_at"]];
             if ([db hadError]) {
                 NSLog(@"Err %d: %@", [db lastErrorCode], [db lastErrorMessage]);
             }
@@ -115,7 +117,7 @@
             // 現バージョンと異なれば create table を実行
             [db beginTransaction];            
             NSLog(@"Create statuses table");
-            [db executeUpdate:@"create table statuses(id integer primary key, text varchar(255));"];			
+            [db executeUpdate:@"create table statuses(id integer primary key, text varchar(255), screen_name varchar(255), created_at varchar(255));"];			
             if ([db hadError]) {
                 NSLog(@"Err %d: %@", [db lastErrorCode], [db lastErrorMessage]);
             }

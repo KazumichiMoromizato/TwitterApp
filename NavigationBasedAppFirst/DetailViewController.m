@@ -12,7 +12,7 @@
 
 @implementation DetailViewController
 @synthesize statusId;
-@synthesize statuses;
+@synthesize status;
 
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -48,22 +48,24 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    NSLog(@"%d", statusId);
     
     NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
-    
-    statuses = [[NSMutableArray alloc] init];
-    
+        
     FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
     if ([db open]) {
         [db setShouldCacheStatements:YES];
-        statuses = [[NSMutableArray alloc] init];
         FMResultSet *rs = [db executeQuery:@"select * from statuses where id = ?", statusId];
         while ([rs next]) {
-            NSLog(@"%d %@", [rs intForColumn:@"id"], [rs stringForColumn:@"text"]);
-            [statuses addObject:[rs stringForColumn:@"text"]];
+            NSArray *values = [NSArray arrayWithObjects:
+                               [rs stringForColumn:@"id"],
+                               [rs stringForColumn:@"text"],
+                               [rs stringForColumn:@"screen_name"],
+                               [rs stringForColumn:@"created_at"],
+                               nil];
+            NSArray *keys = [NSArray arrayWithObjects:@"id", @"text", @"screen_name", @"created_at", nil];
+            status = [[NSDictionary alloc] initWithObjects:values forKeys:keys];
         }
         [rs close];  
         [db close];
@@ -118,7 +120,7 @@
 {
 #warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return [statuses count];
+    return 3;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -131,7 +133,25 @@
     }
     
     // Configure the cell...
-    cell.textLabel.text = [statuses objectAtIndex:indexPath.row];
+        
+    switch (indexPath.row) {
+        case 0:
+            cell.textLabel.text = [status objectForKey:@"screen_name"];
+            break;
+            
+        case 1:
+            cell.textLabel.text = [status objectForKey:@"text"];
+            break;
+            
+        case 2:
+            cell.textLabel.text = [status objectForKey:@"created_at"];
+            break;
+            
+        default:
+            cell.textLabel.text = @"";
+            break;
+    }    
+
 	return cell;
 }
 
