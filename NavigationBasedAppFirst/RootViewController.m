@@ -7,6 +7,7 @@
 //
 
 #import "RootViewController.h"
+#import "SBJson.h"
 
 @implementation RootViewController
 
@@ -136,7 +137,30 @@
 }
 
 -(IBAction)getTwitterUserTimeline:(id)sender{
-    NSLog(@"getTwitterUserTimeline");
+    // twitterからstatusesをダウンロードするためのURLリクエストを準備
+    //    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://kinjojsonengine.appspot.com/_je/messages"]];
+    
+    //    http://twitter.com/status/user_timeline/libkinjo.json
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com/status/user_timeline/libkinjo.json"]];
+    
+    // URLからJSONデータを取得(NSData)
+    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    
+    // JSONで解析するために、NSDataをNSStringに変換。
+    NSString *json_string = [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding];
+    
+    // JSONデータをパースする。
+    // ここではJSONデータが配列としてパースされるので、NSArray型でデータ取得
+    NSArray *statuses = [json_string JSONValue];
+    
+    // statuses内の要素を取り出して、確認
+    for (NSDictionary *status in statuses)
+    {
+        // You can retrieve individual values using objectForKey on the status NSDictionary
+        // This will print the tweet and username to the console
+        NSLog(@"%@", [status objectForKey:@"text"]);
+    }
 }
 
 - (void)didReceiveMemoryWarning
