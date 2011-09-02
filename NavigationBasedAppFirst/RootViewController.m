@@ -7,6 +7,7 @@
 //
 
 #import "RootViewController.h"
+#import "DetailViewController.h"
 #import "SBJson.h"
 #import "FMDatabase.h"
 
@@ -29,7 +30,10 @@
         FMResultSet *rs = [db executeQuery:@"select * from statuses limit 10"];
         while ([rs next]) {
             NSLog(@"%d %@", [rs intForColumn:@"id"], [rs stringForColumn:@"text"]);
-            [statuses addObject:[rs stringForColumn:@"text"]];
+            NSArray *keys = [NSArray arrayWithObjects:@"id", @"text", nil];
+            NSArray *values = [NSArray arrayWithObjects:[rs stringForColumn:@"id"], [rs stringForColumn:@"text"], nil];
+            NSDictionary *row = [[NSDictionary alloc] initWithObjects:values forKeys:keys];
+            [statuses addObject:row];
         }
         [rs close];  
         [db close];
@@ -175,7 +179,8 @@
 		
 	}
         
-    cell.textLabel.text = [statuses objectAtIndex:indexPath.row];
+    cell.textLabel.text = [[statuses objectAtIndex:indexPath.row] objectForKey:@"text"];
+
 	return cell;
 }
 
@@ -230,14 +235,8 @@
     [detailViewController release];
 	*/
     
-    NSString *className = @"DetailViewController";
-    
-    Class class = NSClassFromString( className );
-	UIViewController* viewController = [[[class alloc] init] autorelease];
-	if ( !viewController ) {
-		NSLog( @"%@ was not found.", className );
-		return;
-	} 
+	DetailViewController* viewController = [[[DetailViewController alloc] init] autorelease];
+    viewController.statusId = [[statuses objectAtIndex:indexPath.row] objectForKey:@"id"];
 	[self.navigationController pushViewController:viewController animated:YES];
 }
 

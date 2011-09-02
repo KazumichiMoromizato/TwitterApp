@@ -10,7 +10,11 @@
 
 
 @interface DetailViewController : UITableViewController {
-    
+    NSString *statusId;
+    NSMutableArray *statuses;
 }
+
+@property(nonatomic, retain) NSString *statusId;
+@property(nonatomic, retain) NSMutableArray *statuses;
 
 @end

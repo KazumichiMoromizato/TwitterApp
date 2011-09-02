@@ -7,9 +7,13 @@
 //
 
 #import "DetailViewController.h"
-
+#import "SBJson.h"
+#import "FMDatabase.h"
 
 @implementation DetailViewController
+@synthesize statusId;
+@synthesize statuses;
+
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -44,6 +48,28 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    NSLog(@"%d", statusId);
+    
+    NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
+    
+    statuses = [[NSMutableArray alloc] init];
+    
+    FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
+    if ([db open]) {
+        [db setShouldCacheStatements:YES];
+        statuses = [[NSMutableArray alloc] init];
+        FMResultSet *rs = [db executeQuery:@"select * from statuses where id = ?", statusId];
+        while ([rs next]) {
+            NSLog(@"%d %@", [rs intForColumn:@"id"], [rs stringForColumn:@"text"]);
+            [statuses addObject:[rs stringForColumn:@"text"]];
+        }
+        [rs close];  
+        [db close];
+    }else{
+        NSLog(@"Could not open db.");
+    }
 }
 
 - (void)viewDidUnload
@@ -92,7 +118,7 @@
 {
 #warning Incomplete method implementation.
     // Return the number of rows in the section.
-    return 1;
+    return [statuses count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -105,8 +131,8 @@
     }
     
     // Configure the cell...
-    cell.textLabel.text = @"test";
-    return cell;
+    cell.textLabel.text = [statuses objectAtIndex:indexPath.row];
+	return cell;
 }
 
 /*
