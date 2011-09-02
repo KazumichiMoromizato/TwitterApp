@@ -137,10 +137,6 @@
 }
 
 -(IBAction)getTwitterUserTimeline:(id)sender{
-    // twitterからstatusesをダウンロードするためのURLリクエストを準備
-    //    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://kinjojsonengine.appspot.com/_je/messages"]];
-    
-    //    http://twitter.com/status/user_timeline/libkinjo.json
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com/status/user_timeline/libkinjo.json"]];
     
