@@ -135,6 +135,10 @@
 	[self.navigationController pushViewController:viewController animated:YES];
 }
 
+-(IBAction)getTwitterUserTimeline:(id)sender{
+    NSLog(@"getTwitterUserTimeline");
+}
+
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
