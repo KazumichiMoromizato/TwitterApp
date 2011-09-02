@@ -123,6 +123,16 @@
     [self.navigationController pushViewController:detailViewController animated:YES];
     [detailViewController release];
 	*/
+    
+    NSString *className = @"IssueViewController";
+    
+    Class class = NSClassFromString( className );
+	UIViewController* viewController = [[[class alloc] init] autorelease];
+	if ( !viewController ) {
+		NSLog( @"%@ was not found.", className );
+		return;
+	} 
+	[self.navigationController pushViewController:viewController animated:YES];
 }
 
 - (void)didReceiveMemoryWarning
