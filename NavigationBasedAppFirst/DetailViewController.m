@@ -55,7 +55,6 @@
         
     FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
     if ([db open]) {
-        [db setShouldCacheStatements:YES];
         FMResultSet *rs = [db executeQuery:@"select * from statuses where id = ?", statusId];
         while ([rs next]) {
             NSArray *values = [NSArray arrayWithObjects:

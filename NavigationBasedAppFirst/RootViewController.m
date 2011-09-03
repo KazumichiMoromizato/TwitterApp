@@ -25,8 +25,6 @@
     
     FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
     if ([db open]) {
-        [db setShouldCacheStatements:YES];
-        statuses = [[NSMutableArray alloc] init];
         FMResultSet *rs = [db executeQuery:@"select * from statuses limit 10"];
         while ([rs next]) {
             NSArray *keys = [NSArray arrayWithObjects:@"id", @"text", nil];
@@ -61,9 +59,11 @@
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
     FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
     if ([db open]) {
+        // 以下の setShouldCacheStatements:YES は不要かもしれない
+        // http://stackoverflow.com/questions/4006777/deleting-row-in-sqlite-3 
+        // =[db setShouldCacheStatements:YES]= is experimental, so try without that.
         [db setShouldCacheStatements:YES];
         
-        // statuses内の要素を取り出して、確認
         [db beginTransaction];
         for (NSDictionary *status in jsonrows) {
             // You can retrieve individual values using objectForKey on the status NSDictionary
@@ -86,22 +86,18 @@
     }
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-  
-    BOOL success;
-    NSError *error;	
+
     NSFileManager *fm = [NSFileManager defaultManager];
     NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:@"sample.db"];
-    success = [fm fileExistsAtPath:writableDBPath];
-    if(!success){
+    if(![fm fileExistsAtPath:writableDBPath]){
         NSLog(@"No sample.db exists");
         NSString *defaultDBPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"sample.db"];
-        success = [fm copyItemAtPath:defaultDBPath toPath:writableDBPath error:&error];
-        if(!success){
+        NSError *error;
+        if(![fm copyItemAtPath:defaultDBPath toPath:writableDBPath error:&error]){
             NSLog(@"%@", [error localizedDescription]);
         }
     }
@@ -110,8 +106,6 @@
     // DB バージョンのチェック
     FMDatabase* db = [FMDatabase databaseWithPath:writableDBPath];
     if ([db open]) {
-        [db setShouldCacheStatements:YES];
-        
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM schema_migrations where version = ?", @"1"];
         if (![rs next]) {
             // 現バージョンと異なれば create table を実行
