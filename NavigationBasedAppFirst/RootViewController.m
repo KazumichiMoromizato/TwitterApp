@@ -39,6 +39,23 @@
     }
 }
 
+-(void)imageDownload:(NSString *)imageUrl{
+    //ディレクトリのPathを取得
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *dir = [paths objectAtIndex:0];
+    NSLog(@"%@", dir);
+    
+    //FileManager
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    NSString *dirA = [dir stringByAppendingPathComponent:@"userImage.png"];
+    
+    // 作成
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]];
+        
+    [fm createFileAtPath:dirA contents:data attributes:nil];
+    
+}
 -(void)getTwitterUserTimeline
 { 
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com/status/user_timeline/libkinjodev.json"]];
@@ -53,6 +70,11 @@
     // ここではJSONデータが配列としてパースされるので、NSArray型でデータ取得
     NSArray *jsonrows = [json_string JSONValue];
     
+    //画像の取得
+    NSDictionary *dic = [jsonrows objectAtIndex:0];
+    NSString * imageUrlStr = [[dic objectForKey:@"user"] objectForKey:@"profile_image_url"];
+    [self imageDownload:imageUrlStr];
+    
     // DBに接続
     NSArray  *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -65,7 +87,8 @@
         [db setShouldCacheStatements:YES];
         
         [db beginTransaction];
-        for (NSDictionary *status in jsonrows) {
+        NSDictionary *status;
+        for (status in jsonrows) {
             // You can retrieve individual values using objectForKey on the status NSDictionary
             // This will print the tweet and username to the console
             
@@ -78,9 +101,13 @@
             if ([db hadError]) {
                 NSLog(@"Err %d: %@", [db lastErrorCode], [db lastErrorMessage]);
             }
+            
         }
+
         [db commit];
         [db close];
+        
+        
     }else{
         NSLog(@"Could not open db.");
     }
